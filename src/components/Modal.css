@@ -1,0 +1,85 @@
+:root {
+    --hover-effect-btn-add: #02704F;
+    --hover-effect-btn-cancel: #7202029d;
+}
+
+#area-modal {
+    width: 100vw;
+    height: 100vh;
+    padding: 20px;
+    
+    background-color: red;
+    position: absolute;
+    top: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#modal {
+    width: 100%;
+    max-width: 500px;
+    height: 200px;
+
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 5px;
+    border: 3px solid var(--secondary-color);
+    padding: 30px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#input-modal {
+    width: 95%;
+
+    outline: none;
+    border: none;
+    border-bottom: 2px solid var(--basic-color);
+
+    background: none;
+    padding: 10px;
+
+    color: var(--basic-color);
+    font-family: var(--font);
+}
+
+#input-modal::-webkit-input-placeholder {
+    color: #ffffff93;
+}
+
+.buttons-modal {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    border: 2px solid var(--basic-color);
+
+    color: var(--basic-color);
+    font-family: var(--font);
+
+    cursor: pointer;
+    transition: all 0.2s ease-in;
+}
+
+#add-button-modal {
+    margin-right: 20px;
+    background-color: var(--primary-color);
+}
+
+#add-button-modal:hover {
+    background-color: var(--hover-effect-btn-add);
+}
+
+#cancel-button-modal {
+    background: none;
+}
+
+#cancel-button-modal:hover {
+    background-color: var(--hover-effect-btn-cancel);
+}

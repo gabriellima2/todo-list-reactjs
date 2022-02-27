@@ -1,0 +1,80 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --font: 'Space Mono', monospace;
+    --primary-color: #05F0AA;
+    --secondary-color: #04BD85;
+    --basic-color: #fff;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+
+    padding: 20px;
+    font-family: var(--font);
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: #1c1c1c;
+}
+
+#root {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.initial-area {
+    width: 100%;
+    height: 300px;
+    margin-top: 70px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+}
+
+#new-task-btn {
+    padding: 13px;
+    border: none;
+    border-radius: 5px;
+
+    font-family: var(--font);
+    font-size: 1em;
+    color: #000;
+
+    background-color: var(--primary-color);
+    transition: all 0.3s ease-out;
+    cursor: pointer;
+}
+
+#new-task-btn:hover {
+    background-color: var(--secondary-color);
+}
+
+.none-task-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#none-task {
+    font-size: 1.6em;
+    text-transform: uppercase;
+    color: var(--basic-color);
+    padding: 4px;
+}
+
+.none-task-area > span {
+    border-top: 1px solid var(--basic-color);
+    font-size: 1em;
+    color: var(--primary-color);
+    padding: 10px;
+}
