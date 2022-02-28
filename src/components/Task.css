@@ -10,7 +10,7 @@
     flex-direction: column;
     align-items: center;
     gap: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 
     position: relative;
 
@@ -73,7 +73,7 @@
     background-color: #003b2a;
 }
 
-#isComplete-true, #isComplete-false {
+#isFinished-true, #isFinished-false {
     width: 40px;
     padding: 7px;
     border: 2px solid #fff;
@@ -89,12 +89,12 @@
     cursor: pointer;
 }
 
-#isComplete-true {
+#isFinished-true {
     font-size: 1em;
     color: #fff;
     background-color: var(--color-buttons);
 }
 
-#isComplete-false {
+#isFinished-false {
     background-color: var(--color-elements);
 }

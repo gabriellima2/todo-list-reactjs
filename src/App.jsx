@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from './components/Modal';
 import Task from './components/Task';
 
@@ -6,6 +6,8 @@ import './App.css';
 
 function App() {
   const [ modalIsVisible, setModalIsVisible ] = useState(false);
+  const [ controlLocalStorage, setControlLocalStorage ] = useState(false);
+
   const [ allTasks, setAllTasks ] = useState(
     localStorage.getItem('tasks') 
     ? 
@@ -13,17 +15,19 @@ function App() {
     : 
     []
   );
-  const [ completedTask, setCompletedTask ] = useState(false);
+
   const [ totalTasks, setTotalTasks ] = useState(allTasks.length);
   const [ introdutionText, setIntrodutionText ] = useState('');
+
   const [ taskID, setTaskID ] = useState(
     localStorage.getItem('id') 
     ? 
     Number(localStorage.getItem('id')) 
     : 
     // Se tiver tarefa retorna o id da ultima somando 1, senao retorna 0!
-    () => totalTasks >= 1 ? allTasks[ totalTasks - 1 ].id + 1 : 0
+    () => totalTasks >= 1 ? allTasks[totalTasks - 1].id + 1 : 0
   );
+
 
   useEffect(() => {
     localStorage.setItem('id', taskID);
@@ -31,21 +35,22 @@ function App() {
 
   useEffect(() => {
     localStorage.setItem('tasks', JSON.stringify([ ...allTasks ]));
-  }, [ allTasks, completedTask ]);
+  }, [ allTasks, controlLocalStorage ]);
 
   useEffect(() => {
     setTotalTasks(allTasks.length);
-  }, [ allTasks ]);
 
-  useEffect(() => {
-      if ( totalTasks === 0 ) {
-        setIntrodutionText('Nenhuma tarefa!');
-      } else if( totalTasks === 1 ) {
-        setIntrodutionText(`Total de ${totalTasks} tarefa!`);
-      } else {
-        setIntrodutionText(`Total de ${totalTasks} tarefas!`);
-      };
-  }, [ totalTasks ]);
+    if ( totalTasks === 0 ) {
+      setIntrodutionText('Nenhuma tarefa!');
+
+    } else if( totalTasks === 1 ) {
+      setIntrodutionText(`Total de ${totalTasks} tarefa!`);
+
+    } else {
+      setIntrodutionText(`Total de ${totalTasks} tarefas!`);
+    };
+
+  }, [ allTasks, totalTasks ]);
 
   return (
     <>
@@ -59,7 +64,7 @@ function App() {
               Para começar adicione alguma tarefa que você precisa realizar!
             </span>
             : 
-            null 
+            null
           }
         </div>
         
@@ -94,17 +99,17 @@ function App() {
         }
       </div>
 
-      <ul>
+      <ul className='tasks-area'>
         { allTasks.map( task => (
-          console.log(task),
           <Task 
             value={ task.text } 
             id={ task.id }
-            isComplete={ task.completed }
+            isDone={ task.finished }
             allTasks={ [...allTasks] } 
             setAllTasks={ setAllTasks }
-            valueButton={ task.completed ? '✔' : '.' }
-            setCompletedTask={ setCompletedTask }
+            valueButton={ task.finished ? '✔' : '.' }
+            controlLocalStorage={ controlLocalStorage }
+            setControlLocalStorage={ setControlLocalStorage }
             key={ task.id } 
           />
         ))}

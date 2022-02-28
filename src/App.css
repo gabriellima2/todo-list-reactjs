@@ -12,7 +12,7 @@
 }
 
 body {
-    height: 100vh;
+    height: 100%;
     display: flex;
     justify-content: center;
 
@@ -23,11 +23,23 @@ body {
     background-color: #1c1c1c;
 }
 
+body::-webkit-scrollbar {
+    width: 5px;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: var(--secondary-color);
+}
+
+body::-webkit-scrollbar-track {
+    background-color: #1c1c1c;
+}
+
 #root {
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    height: 100%;
+    display: grid;
+    place-items: center;
 }
 
 .initial-area {
@@ -43,14 +55,14 @@ body {
 
 #new-task-btn {
     padding: 13px;
-    border: none;
+    border: 2px solid var(--primary-color);
     border-radius: 5px;
 
     font-family: var(--font);
     font-size: 1em;
-    color: #000;
+    color: var(--basic-color);
 
-    background-color: var(--primary-color);
+    background: none;
     transition: all 0.3s ease-out;
     cursor: pointer;
 }

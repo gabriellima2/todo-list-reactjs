@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import './Modal.css';
 
@@ -28,7 +28,7 @@ export default function Modal(props) {
         const newTask = {
             text: taskValue,
             id: props.taskID,
-            completed: false
+            finished: false
         };
 
         props.setAllTasks([ ...props.allTasks, newTask ]);
@@ -67,7 +67,8 @@ export default function Modal(props) {
                 id='input-modal'
                 onChange={ handleChange }
                 autoComplete='off'
-                maxLength='60'
+                autoFocus={ true }
+                maxLength='100'
                 placeholder={ props.attributesModal.placeholder } 
                 onKeyPress={ verifyKey }
                 value={ taskValue ? taskValue : '' } />

@@ -5,20 +5,21 @@ import './Task.css'
 
 export default function Task(props) {
     const [ isEditing, setIsEditing ] = useState(false);
-    const [ complete, setComplete ] = useState(props.isComplete);
+    const [ isFinished, setIsFinished ] = useState(props.isDone);
     const [ valueText, setValueText ] = useState('');
     const [ idTaskEdit, setIdTaskEdit ] = useState(0);
-    const [ valueButtonComplete, setValueButtonComplete ] = useState(props.valueButton);
+    const [ valueButtonFinished, setValueButtonFinished ] = useState(props.valueButton);
 
-    console.log(props.valueButton)
-
-    const handleCompletedTask = id => {
+    const handleFinishedTask = id => {
         props.allTasks.map( task => {
             if ( task.id === id ) {
-                task.completed = !task.completed;
-                props.setCompletedTask( task.completed );
-                setValueButtonComplete( task.completed ? '✔' : '.' );
-                setComplete(task.completed);
+                task.finished = !task.finished;
+
+                // Para ativar o useEffect e alterar o objeto no localStorage!
+                props.setControlLocalStorage( !props.controlLocalStorage );
+
+                setValueButtonFinished( task.finished ? '✔' : '.' );
+                setIsFinished( task.finished );
             };
         });
     };
@@ -60,9 +61,9 @@ export default function Task(props) {
             }
             <div id='task-item'>
                 <button
-                    id={`isComplete-${ complete }`}
-                    onClick={ () => handleCompletedTask(props.id) }>
-                    { valueButtonComplete }
+                    id={`isFinished-${ isFinished }`}
+                    onClick={ () => handleFinishedTask(props.id) }>
+                    { valueButtonFinished }
                 </button>
                 <textarea
                     id='task-item-text'
