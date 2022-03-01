@@ -9,6 +9,9 @@
     left: 0;
     z-index: 1000;
 
+    overflow-y: auto;
+    overflow-x: hidden;
+
     display: flex;
     align-items: center;
     justify-content: center;
