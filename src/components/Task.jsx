@@ -1,90 +1,96 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useContext, useCallback, useRef } from "react";
 import Modal from "./Modal";
 
 import './Task.css'
 
 export default function Task(props) {
-    const [ isEditing, setIsEditing ] = useState(false);
-    const [ isFinished, setIsFinished ] = useState(props.isDone);
-    const [ valueText, setValueText ] = useState('');
-    const [ idTaskEdit, setIdTaskEdit ] = useState(0);
-    const [ valueButtonFinished, setValueButtonFinished ] = useState(props.valueButton);
+    const refModalEdit = useRef(null);
+    const [ isFinished, setIsFinished ] = useState(props.values.isDone);
+
+    const [ 
+        finishedButtonText ,
+        setfinishedButtonText 
+    ] = useState(props.buttonText);
+
+    const {
+        allTasks,
+        setAllTasks,
+        ...rest
+    } = useContext(props.context);
+
+    const openModal = useCallback((text, id) => {
+        refModalEdit.current ?.handleActiveModal(text, id);
+    });
+
 
     const handleFinishedTask = id => {
-        props.allTasks.map( task => {
+        allTasks.map( task => {
             if ( task.id === id ) {
                 task.finished = !task.finished;
 
                 // Para ativar o useEffect e alterar o objeto no localStorage!
                 props.setControlLocalStorage( !props.controlLocalStorage );
 
-                setValueButtonFinished( task.finished ? '✔' : '.' );
+                setfinishedButtonText( task.finished ? '✔' : '.' );
                 setIsFinished( task.finished );
             };
         });
     };
 
     const edit = id => {
-        props.allTasks.map( task => {
-            if ( task.id === id ) {
-                setValueText( task.text );
-                setIdTaskEdit( id );
-            };
+        allTasks.map( task => {
+            if ( task.id === id  ) {
+                openModal(task.text, task.id);
+            }; 
         });
-
-        setIsEditing(true);
     };
 
     const del = id => {
-        props.setAllTasks(props.allTasks.filter( task => {
-            return task.id !== id;
-        }));
+        setAllTasks( allTasks.filter( task => task.id !== id ));
     };
 
     return (
         <>
-            {
-                isEditing ? <Modal 
-                
-                // Defini atributos ao modal mas, para edição da tarefa!
+            <Modal 
                 attributesModal={{
                     type: {
                         add: false,
                         edit: true
                     },
-                    text: valueText,
                     placeholder: 'Editando tarefa',
-                    hideModal: setIsEditing,
-                    idTaskEdit
-                }} allTasks={[ ...props.allTasks ]} setAllTasks={ props.setAllTasks } /> 
-                : null
-            }
+                }}
+                context={ props.context }
+                ref={ refModalEdit }
+            />
+
             <div id='task-item'>
-                <button
+                <button 
                     id={`isFinished-${ isFinished }`}
-                    onClick={ () => handleFinishedTask(props.id) }>
-                    { valueButtonFinished }
+                    onClick={ () => handleFinishedTask(props.values.id) }
+                    >
+                    { finishedButtonText }
                 </button>
                 <textarea
                     id='task-item-text'
                     readOnly={ true }
-                    value={ props.value }>
-                </textarea>
+                    value={ props.values.text }
+                ></textarea>
+
                 <div id='task-item-buttons-area'>
-                    <button 
+                    <button
                         className='task-item-btn'
                         id='btn-edit'
-                        onClick={ () => edit(props.id) }>
-                        Editar
+                        onClick={ () => edit(props.values.id) }
+                    >Editar
                     </button>
                     <button
                         className='task-item-btn'
                         id='btn-delete'
-                        onClick={ () => del(props.id) }>
-                        Deletar
+                        onClick={ () => del(props.values.id) }
+                    >Deletar
                     </button>
                 </div>
-            </div>       
+            </div>
         </>
-    )
-}
+    );
+};

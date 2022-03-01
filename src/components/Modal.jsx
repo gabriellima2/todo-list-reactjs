@@ -1,9 +1,42 @@
-import { useState } from 'react';
+import { 
+    forwardRef, 
+    useCallback,
+    useContext, 
+    useImperativeHandle,
+    useState 
+} from "react";
 
 import './Modal.css';
 
-export default function Modal(props) {
-    const [ taskValue, setTaskValue ] = useState(props.attributesModal.text);
+function Modal(props, ref) {
+    const [ isVisible, setIsVisible ] = useState(false);
+    const [ textValue, setTextValue ] = useState('');
+    const [ idValue, setIdValue ] = useState(0);
+
+    const { 
+        allTasks,
+        setAllTasks,
+        taskId,
+        setTaskId,
+    } = useContext(props.context);
+    const { add: isAdd, edit: isEdit } = props.attributesModal.type;
+
+    const handleCancel = ({ target }) => {
+        if ( target.id !== 'area-modal' && target.id !== 'cancel-button-modal' ) return;
+
+        handleDesactiveModal();
+    };
+
+    // Ativa o modal com valores pre-definidos para editar a tarefa!
+    const handleActiveModal = useCallback((text='', id=0) => {
+        setTextValue(text);
+        setIdValue(id);
+        setIsVisible(true);
+    }, []);
+
+    const handleDesactiveModal = useCallback(() => {
+        setIsVisible(false);
+    });
 
     const verifyKey = ({ code }) => {
         if ( code !== 'Enter' ) return;
@@ -12,90 +45,84 @@ export default function Modal(props) {
     };
 
     const validateInput = () => {
-        setTaskValue(taskValue.trim());
+        setTextValue( textValue.trim() );
 
-        if ( taskValue === '' ) return;
+        if ( textValue === '' ) return;
 
-        if ( props.attributesModal.type.add ) {
+        if ( isAdd ) {
             addNewTask();
-
-        } else if ( props.attributesModal.type.edit ) {
-            editTask(props.attributesModal.idTaskEdit);
+        } else if ( isEdit ) {
+            editTask();
         };
     };
 
-    const addNewTask = () => {
+    const addNewTask =  () => {
         const newTask = {
-            text: taskValue,
-            id: props.taskID,
+            text: textValue,
+            id: taskId,
             finished: false
         };
+        setAllTasks([ ...allTasks, newTask ]);
+        setTextValue('');
+        setTaskId( state => state + 1 );
 
-        props.setAllTasks([ ...props.allTasks, newTask ]);
-
-        setTaskValue('');
-        props.setTaskID( state => state + 1 );
-
-        props.attributesModal.hideModal();
+        handleDesactiveModal();
     };
 
-    const editTask = id => {
-        props.allTasks.map( task => {
-            if ( task.id === id ) {
-                task.text = taskValue
-                props.setAllTasks([ ...props.allTasks ]);
+    const editTask = () => {
+        allTasks.map(task => {
+            if ( task.id === idValue ) {
+                task.text = textValue;
+                setAllTasks( [... allTasks] );
             };
         });
-        props.attributesModal.hideModal();
-    };
-
-    const handleDisableModal = ({ target }) => {
-        if( target.id !== 'area-modal' && target.id !== 'cancel-button-modal' ) return;
-
-        props.attributesModal.hideModal();
+        handleDesactiveModal();
     };
 
     const handleChange = ({ target }) => {
-        setTaskValue(target.value);
+        setTextValue(target.value);
     };
 
+    useImperativeHandle(ref, () => {
+        return {
+            handleActiveModal
+        };
+    });
+
+    if ( !isVisible ) return null;
+
     return (
-        <div id='area-modal' onClick={ handleDisableModal }>
+        <div id='area-modal' onClick={ handleCancel }>
             <div id='modal'>
-            <input
-                type='text'
-                id='input-modal'
-                onChange={ handleChange }
-                autoComplete='off'
-                autoFocus={ true }
-                maxLength='100'
-                placeholder={ props.attributesModal.placeholder } 
-                onKeyPress={ verifyKey }
-                value={ taskValue ? taskValue : '' } />
+                <input 
+                    type='text'
+                    id='input-modal'
+                    autoComplete='off'
+                    autoFocus={ true }
+                    maxLength='100'
+                    placeholder={ props.attributesModal.placeholder }
+                    onChange={ handleChange }
+                    onKeyPress={ verifyKey }
+                    defaultValue={ textValue ? textValue : '' }
+                />
                 <div>
-                    <button 
+                    <button
                         className='buttons-modal'
                         id='add-button-modal'
                         onClick={ validateInput }>
-                        { 
-                            props.attributesModal.type.add
-                            ?
-                            'Adicionar'
-                            :
-                            props.attributesModal.type.edit
-                            ?
-                            'Editar'
-                            : null
-                        }
+                            {
+                                isAdd ? 'Adicionar' : isEdit ? 'Editar' : null
+                            }
                     </button>
-
                     <button
                         className='buttons-modal'
                         id='cancel-button-modal'
-                        onClick={ handleDisableModal }>Cancelar
+                        onClick={ handleCancel }>Cancelar
                     </button>
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
+
+export default forwardRef(Modal);

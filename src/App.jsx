@@ -1,121 +1,131 @@
-import React, { useEffect, useState } from 'react';
-import Modal from './components/Modal';
-import Task from './components/Task';
+import { createContext,
+    useCallback,
+    useEffect,
+    useRef,
+    useState 
+} from "react";
+
+import Modal from "./components/Modal";
+import Task from "./components/Task";
 
 import './App.css';
 
-function App() {
-  const [ modalIsVisible, setModalIsVisible ] = useState(false);
-  const [ controlLocalStorage, setControlLocalStorage ] = useState(false);
+const LOCAL_STORAGE_TASKS_KEY = 'tasks';
+const LOCAL_STORAGE_ID_KEY = 'id';
 
-  const [ allTasks, setAllTasks ] = useState(
-    localStorage.getItem('tasks') 
-    ? 
-    JSON.parse(localStorage.getItem('tasks')) 
-    : 
-    []
-  );
+const Context = createContext();
 
-  const [ totalTasks, setTotalTasks ] = useState(allTasks.length);
-  const [ introdutionText, setIntrodutionText ] = useState('');
+function findTasks() {
+    const valueLocalStorage = localStorage.getItem(LOCAL_STORAGE_TASKS_KEY);
 
-  const [ taskID, setTaskID ] = useState(
-    localStorage.getItem('id') 
-    ? 
-    Number(localStorage.getItem('id')) 
-    : 
-    // Se tiver tarefa retorna o id da ultima somando 1, senao retorna 0!
-    () => totalTasks >= 1 ? allTasks[totalTasks - 1].id + 1 : 0
-  );
+    if ( !valueLocalStorage ) return [];
 
+    return JSON.parse(valueLocalStorage);
+};
 
-  useEffect(() => {
-    localStorage.setItem('id', taskID);
-  }, [ taskID ])
+function findId(allTasks, totalTasks) {
+    const idLocalStorage = localStorage.getItem(LOCAL_STORAGE_ID_KEY);
 
-  useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify([ ...allTasks ]));
-  }, [ allTasks, controlLocalStorage ]);
+    if ( idLocalStorage ) return Number(idLocalStorage);
 
-  useEffect(() => {
-    setTotalTasks(allTasks.length);
+    if ( totalTasks === 0 ) return 0;
 
-    if ( totalTasks === 0 ) {
-      setIntrodutionText('Nenhuma tarefa!');
+    const lastTask = allTasks[totalTasks - 1];
+    if ( totalTasks > 0 ) return lastTask.id + 1;
+};
 
-    } else if( totalTasks === 1 ) {
-      setIntrodutionText(`Total de ${totalTasks} tarefa!`);
+export default function App() {
+    const refModalAdd = useRef(null);
+    const [ introdutionText, setIntrodutionText ] = useState('');
+    const [ controlLocalStorage, setControlLocalStorage ] = useState(false);
 
-    } else {
-      setIntrodutionText(`Total de ${totalTasks} tarefas!`);
-    };
+    const [ allTasks, setAllTasks ] = useState( findTasks() );
+    const [ totalTasks, setTotalTasks ] = useState(allTasks.length);
+    const [ taskId, setTaskId ] = useState( findId(allTasks, totalTasks) );
+    
+    useEffect(() => {
+        localStorage.setItem(LOCAL_STORAGE_ID_KEY, taskId);
+    }, [ taskId ]);
 
-  }, [ allTasks, totalTasks ]);
+    useEffect(() => {
+        localStorage.setItem(LOCAL_STORAGE_TASKS_KEY, JSON.stringify(allTasks));
+    }, [ allTasks, controlLocalStorage ]);
 
-  return (
-    <>
-      <div className='initial-area'>
-        <div className='none-task-area'>
-          <p id='none-task'>{ introdutionText }</p>
-          { 
-            totalTasks === 0 
-            ? 
-            <span>
-              Para começar adicione alguma tarefa que você precisa realizar!
-            </span>
-            : 
-            null
-          }
-        </div>
+    useEffect(() => {
+        setTotalTasks(allTasks.length);
+
+        if ( totalTasks === 0 ) return setIntrodutionText('Nenhuma tarefa!');
+
+        if ( totalTasks === 1 ) {
+            return setIntrodutionText(`Total de ${totalTasks} tarefa!`);
+        } else if ( totalTasks > 1 ) {
+            return setIntrodutionText(`Total de ${totalTasks} tarefas!`);
+        };
         
-        <button
-          id='new-task-btn'
-          onClick={ () => setModalIsVisible(!modalIsVisible) }>
-          Nova Tarefa
-        </button>
+    }, [ allTasks, totalTasks ]);
 
-        {
-          modalIsVisible
-          ? 
-          <Modal
-            allTasks={ [...allTasks] }
-            setAllTasks={ setAllTasks }
-            taskID={ taskID }
-            setTaskID={ setTaskID }
+    const openModal = useCallback(() => {
+        refModalAdd.current ?.handleActiveModal();
+    });
 
-          // Para passar propriedade definindo os atributos do modal para adição de tarefas!
-            attributesModal={{
-              type: {
-                add: true,
-                edit: false
-              },
-              text: '',
-              placeholder: 'Digite a tarefa',
-              hideModal: setModalIsVisible,
-            }}
-          /> 
-          : 
-            null
-        }
-      </div>
+    return (
+        <>
+            <div className='initial-area'>
+                <div className='none-task-area'>
+                    <p id='none-task'>{ introdutionText }</p>
+                    {
+                        totalTasks === 0 ? 
+                        <span>
+                            Para começar adicione alguma tarefa que 
+                            você precisa realizar!
+                        </span> 
+                        : null
+                    }
+                </div>
+                <button 
+                    id='new-task-btn'
+                    onClick={ openModal }
+                >
+                    Nova Tarefa
+                </button>
+            </div>
+            <Context.Provider value={{
+                allTasks,
+                setAllTasks,
+                taskId,
+                setTaskId
+            }}>
+                <Modal 
+                    attributesModal={{
+                        type: {
+                            add: true,
+                            edit: false
+                        },
+                        text: '',
+                        placeholder: 'Digite a tarefa'
+                    }}
+                    context={ Context }
+                    ref={ refModalAdd }
+                />
 
-      <ul className='tasks-area'>
-        { allTasks.map( task => (
-          <Task 
-            value={ task.text } 
-            id={ task.id }
-            isDone={ task.finished }
-            allTasks={ [...allTasks] } 
-            setAllTasks={ setAllTasks }
-            valueButton={ task.finished ? '✔' : '.' }
-            controlLocalStorage={ controlLocalStorage }
-            setControlLocalStorage={ setControlLocalStorage }
-            key={ task.id } 
-          />
-        ))}
-      </ul>
-    </>
-  )
-}
-
-export default App
+                <ul className='tasks-area'>
+                    {
+                        allTasks.map( task => (
+                            <Task key={ task.id }
+                                values={{
+                                    text: task.text,
+                                    id: task.id,
+                                    isDone: task.finished
+                                }}
+                                context={ Context }
+                                buttonText={ task.finished ? '✔' : '.' }
+                                controlLocalStorage={ controlLocalStorage }
+                                setControlLocalStorage={ setControlLocalStorage }
+                            />
+                        ))
+                    }
+                </ul>
+            </Context.Provider>
+        </>
+    );
+};
