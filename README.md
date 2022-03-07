@@ -8,6 +8,10 @@ Esse projeto é uma lista de tarefas, foi usado a ferramenta [Vite](https://vite
 
 <h2></h2>
 
+<img src="./src/public/img/img3.png" >
+
+<h2></h2>
+
 <img src="./src/public/img/img2.png" >
 
 <h2>Funcionalidades:</h2>
