@@ -2,6 +2,22 @@
 
 Esse projeto é uma lista de tarefas, foi usado a ferramenta [Vite](https://vitejs.dev) e o [ReactJS](https://pt-br.reactjs.org) para o desenvolvimento do projeto.
 
+<h2>Imagens:</h2>
+
+<img src="./src/public/img/img1.png" >
+
+<h2></h2>
+
+<img src="./src/public/img/img2.png" >
+
+<h2>Funcionalidades:</h2>
+
+- Texto dinâmico.
+- Modal para adicionar tarefa.
+- Validação do input.
+- Armazenamento no LocalStorage.
+- Checkbox para marcar como tarefa completa.
+
 # Rodando o projeto:
 OBS: É necessário que tenha o [NodeJS](https://nodejs.org/en/) e o [Git](https://git-scm.com) instalado em sua maquina.
 
